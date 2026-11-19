@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><title>Hoffis Abschieds-Quiz</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#f4f0fb;--fg:#1d1233;--card:#fff;--mut:#6b5f86;--ac:#7c3aed;--ok:#1f9d55;--no:#d93636;--c0:#e21b3c;--c1:#1368ce;--c2:#c98a00;--c3:#26890c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1a1030;--fg:#f4efff;--card:#2a1b4a;--mut:#b3a6d1;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1a1030;--fg:#f4efff;--card:#2a1b4a;--mut:#b3a6d1;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+#app{max-width:900px;margin:0 auto;padding:16px}
+h1{font-size:1.8rem;margin:.3em 0}h2{margin:.4em 0}
+.card{background:var(--card);border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 2px 8px #0002}
+.mut{color:var(--mut)}.c{text-align:center}
+button{font:inherit;font-weight:700;border:0;border-radius:12px;padding:14px 18px;background:var(--ac);color:#fff;cursor:pointer;width:100%;margin:6px 0}
+button.s{background:var(--card);color:var(--fg);border:2px solid var(--ac)}
+button:disabled{opacity:.5}
+input[type=text],input:not([type]){font:inherit;width:100%;padding:14px;border-radius:12px;border:2px solid var(--mut);background:var(--bg);color:var(--fg);margin:6px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{border-radius:14px;padding:18px 10px;color:#fff;font-weight:700;font-size:1.05rem;min-height:84px;display:flex;align-items:center;gap:8px}
+.opt.b{cursor:pointer;border:0;width:100%;margin:0;text-align:left}
+.o0{background:var(--c0)}.o1{background:var(--c1)}.o2{background:var(--c2)}.o3{background:var(--c3)}
+.opt.dim{opacity:.35}.opt.right{outline:5px solid var(--ok)}
+.big{font-size:3rem;font-weight:800}
+.hoffi{background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;border-radius:16px;padding:14px;margin:12px 0;font-weight:700}
+.row{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid #8884}
+.chip{display:inline-block;padding:4px 10px;border-radius:99px;background:var(--ac);color:#fff;margin:3px;font-size:.9rem}
+.chip.h{background:#ef4444}
+.bar{height:10px;border-radius:5px;background:#fff6;margin-top:4px}.bar i{display:block;height:100%;border-radius:5px;background:#fff}
+.tag{font-size:.8rem;padding:2px 8px;border-radius:99px;background:var(--mut);color:var(--bg)}
+label{display:block;margin:8px 0}
+.ok{color:var(--ok)}.no{color:var(--no)}
+</style></head><body><div id="app"></div>
+<script>
+const $=s=>document.querySelector(s),app=$('#app');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=n=>Number(n).toLocaleString('de-DE'),SH=['▲','◆','●','■'];
+const ch=(t,d,o,c)=>({t,d,o,c}),es=(t,d,c,u,tol,x)=>({t,d,c,u,tol,x});
+const Q=[
+ch('Wie heißt der aktuelle Staatspräsident der Volksrepublik China?','Leicht',['Xi Jinping','Hu Jintao','Li Qiang','Deng Xiaoping'],0),
+ch('Welches Tier gilt in China als Nationalschatz und diplomatisches Symbol?','Leicht',['Sibirischer Tiger','Großer Panda','Goldstumpfnase','Chinesischer Alligator'],1),
+es('Wie lang ist die Chinesische Mauer insgesamt (inklusive aller Nebenarme und Gräben)?','Mittel',21196,'km',10000),
+ch('Welche der „Vier großen Erfindungen“ des alten China stammt nicht ursprünglich aus China?','Mittel',['Papier','Buchdruck','Das Teleskop','Schießpulver'],2),
+es('Wie viele Einwohner hat Chinas bevölkerungsreichste Stadt Chongqing (als direkte Regierungsstadt insgesamt)? Antwort in Millionen.','Mittel',32,'Mio. Einwohner',16,'ca. 32 Mio. Einwohner'),
+ch('Wie heißt das bekannte chinesische Hochgeschwindigkeitszug-System?','Mittel',['Shinkansen','KTX','Fuxing / CRH','Maglev-X'],2),
+es('Wie viele verschiedene Zeitzonen durchquert China geografisch – obwohl offiziell im ganzen Land nur die Peking-Zeit gilt?','Schwer',5,'Zeitzonen',3),
+ch('In welcher chinesischen Provinz liegt die berühmte Terrakotta-Armee von Kaiser Qin Shihuangdi?','Schwer',['Sichuan','Shaanxi (bei Xi’an)','Yunnan','Henan'],1),
+es('Wie hoch ist der Shanghai Tower, das höchste Gebäude Chinas?','Schwer',632,'m',300),
+ch('Welcher chinesische Fluss ist mit über 6.300 Kilometern der längste Fluss Asiens?','Experte',['Gelber Fluss / Huang He','Perlfluss','Mekong','Jangtsekiang'],3),
+ch('Welches dieser Tiere gehört NICHT zu den zwölf chinesischen Tierkreiszeichen?','Mittel',['Drache','Ziege','Katze','Hahn'],2),
+es('In welchem Jahr wurde die Volksrepublik China gegründet?','Mittel',1949,'(Jahr)',30,'1949'),
+ch('Wie heißt das uralte chinesische Strategie-Brettspiel, das auf Chinesisch „Weiqi“ genannt wird?','Schwer',['Mahjong','Xiangqi','Go','Shogi'],2)
+];
+const TM=q=>q.o?20:30;
+const aTxt=(q,a)=>a==null?'keine Antwort':q.o?q.o[a]:fmt(a)+' '+q.u;
+const cTxt=q=>q.o?q.o[q.c]:(q.x||fmt(q.c)+' '+q.u);
+const TN={h:'🧳 Team Hoffi',g:'🎉 Gäste'};
+let room=null,canHost=false,role=null;
+const el=s=>$(s);
+function home(){
+ role=null;
+ app.innerHTML=`<div class="c"><h1>🐼 Hoffis Abschieds-Quiz</h1><p class="mut">Team Hoffi gegen die Gäste – 13 Fragen rund um China</p></div>
+ <div class="card"><button id="bp">📱 Mitspielen</button>${canHost?'<button class="s" id="bh">🎤 Als Host starten</button>':'<p class="mut c">Host-Modus nur für den Besitzer/Editor der Seite.</p>'}
+ <p class="mut c" id="st">${room?'Verbunden ✓':'Verbinde mit dem Raum …'}</p></div>`;
+ el('#bp').onclick=playerJoin;if(canHost)el('#bh').onclick=hostStart;
+}
+(async()=>{
+ try{room=await claude.use('room')}catch(e){}
+ try{const u=await claude.use('user');canHost=!!(u&&u.canEdit())}catch(e){}
+ if(role===null)home();
+})();
+home();
+
+/* ---------- SPIELER ---------- */
+let me=null,S={p:'w'},ans={},qt0=0,lastI=-1,pkey='';
+function playerJoin(){
+ role='p';let sv={};try{sv=JSON.parse(localStorage.getItem('hq')||'{}')}catch(e){}
+ app.innerHTML=`<h1>Beitreten</h1><div class="card"><input id="nm" maxlength="16" placeholder="Dein Name" value="${esc(sv.n||'')}">
+ <label><input type="radio" name="tm" value="h"> 🧳 Team Hoffi</label><label><input type="radio" name="tm" value="g" checked> 🎉 Gäste</label>
+ <label><input type="checkbox" id="hf"> Ich bin Hoffi persönlich</label><button id="go">Los geht’s</button>
+ ${room?'':'<p class="no">Kein Raum verfügbar – Seite bitte angemeldet in claude.ai öffnen.</p>'}</div>`;
+ el('#hf').onchange=e=>{if(e.target.checked)document.querySelector('input[value=h]').checked=true};
+ el('#go').onclick=()=>{
+  const n=el('#nm').value.trim();if(!n||!room)return;
+  const hoffi=el('#hf').checked,team=hoffi?'h':document.querySelector('input[name=tm]:checked').value;
+  me={id:sv.id||Math.random().toString(36).slice(2,6),n,team,hoffi};
+  try{localStorage.setItem('hq',JSON.stringify(me))}catch(e){}
+  room.on('st',m=>{S=m.data||S;S.rx=Date.now();
+   if(S.p==='q'&&S.i!==lastI){lastI=S.i;qt0=Date.now()-(TM(Q[S.i])-S.left)*1000}pr()});
+  const j=()=>room.emit('join',me);j();setInterval(j,6000);pr();
+ };
+}
+function pr(){
+ if(!me)return;
+ const k=[S.p,S.i,S.n,!!ans[S.i]].join('|');
+ if(k===pkey)return;pkey=k;
+ const q=Q[S.i],hd=q?`<div class="mut">Frage ${S.i+1}/${Q.length} <span class="tag">${q.d}</span></div>`:'';
+ const tn=`<div class="mut c">${esc(me.n)} · ${TN[me.team]}</div>`;
+ if(S.p==='w'||S.p==='l')app.innerHTML=`<div class="c"><h1>Du bist dabei! 🎉</h1>${tn}<p class="mut">Warte auf den Start durch den Host …</p>${S.n?`<p>${S.n} Spieler im Raum</p>`:''}</div>`;
+ else if(S.p==='q'){
+  if(ans[S.i])app.innerHTML=`${hd}<div class="card c"><h2>✓ Antwort gesendet</h2><p class="mut">Warte auf die anderen …</p></div><div class="c big" id="tm"></div>`;
+  else app.innerHTML=`${hd}<div class="card"><h2>${q.t}</h2></div><div class="c big" id="tm">${S.left}</div>`+
+   (q.o?`<div class="grid">${q.o.map((o,i)=>`<button class="opt b o${i}" data-i="${i}"><span>${SH[i]}</span>${o}</button>`).join('')}</div>`
+   :`<div class="card"><input id="gs" inputmode="decimal" placeholder="Deine Schätzung (${q.u})"><button id="sd">Senden</button></div>`);
+  document.querySelectorAll('.b').forEach(b=>b.onclick=()=>send(+b.dataset.i));
+  const sd=el('#sd');if(sd)sd.onclick=()=>{let v=el('#gs').value.trim().replace(/\s/g,'');if(/^\d{1,3}(\.\d{3})+$/.test(v))v=v.replace(/\./g,'');v=parseFloat(v.replace(',','.'));if(isNaN(v))return;send(v)};
+ }else{
+  const r=S.r||{},mine=r[me.id]||[0,0],sorted=Object.entries(r).sort((a,b)=>b[1][0]-a[1][0]),rank=sorted.findIndex(x=>x[0]===me.id)+1;
+  const hoffi=S.h?`<div class="hoffi">🧳 Hoffi sagte: „${esc(S.h[0])}“ (+${S.h[1]} Punkte)</div>`:`<div class="hoffi">🧳 Hoffi hat nicht geantwortet</div>`;
+  const tm=S.t?`<div class="card c"><b>Ø Punkte pro Spieler</b><div class="row"><span>${TN.h}</span><b>${S.t[0]}</b></div><div class="row"><span>${TN.g}</span><b>${S.t[1]}</b></div></div>`:'';
+  if(S.p==='r')app.innerHTML=`${hd}<div class="card c"><div class="big ${mine[1]>0?'ok':'no'}">${mine[1]>0?'Richtig!':'Leider nein'}</div><p>+${mine[1]} Punkte · gesamt ${fmt(mine[0])}</p><p class="mut">Richtig: <b>${esc(cTxt(q))}</b></p><p>Platz ${rank} von ${sorted.length}</p></div>${hoffi}${tm}`;
+  else{const lb=(S.lb||[]).slice(0,5).map((x,i)=>`<div class="row"><span>${i+1}. ${esc(x[0])} <span class="mut">${x[2]==='h'?'🧳':'🎉'}</span></span><b>${fmt(x[1])}</b></div>`).join('');
+   const win=S.t[0]===S.t[1]?'Unentschieden!':(S.t[0]>S.t[1]?'Team Hoffi gewinnt! 🧳':'Die Gäste gewinnen! 🎉');
+   app.innerHTML=`<div class="c"><h1>Endstand</h1><div class="big">Platz ${rank}</div><p>${fmt(mine[0])} Punkte</p></div><div class="card c"><h2>${win}</h2>${tm.replace('card c','')}</div><div class="card">${lb}</div>`;}
+ }
+}
+function send(a){ans[S.i]=true;room.emit('ans',{id:me.id,i:S.i,a,ms:Date.now()-qt0});pkey='';pr()}
+setInterval(()=>{if(role==='p'&&S.p==='q'){const t=el('#tm');if(t&&!ans[S.i])t.textContent=Math.max(0,Math.ceil(S.left-(Date.now()-S.rx)/1000))}},250);
+
+/* ---------- HOST ---------- */
+let H={p:'l',i:-1,pl:{},an:{},dl:0,e:null,hf:null},hkey='';
+const N=()=>Object.keys(H.pl).length;
+function teams(){return['h','g'].map(t=>{const a=Object.values(H.pl).filter(p=>p.team===t);return a.length?Math.round(a.reduce((s,p)=>s+p.s,0)/a.length):0})}
+const rank=()=>Object.values(H.pl).sort((a,b)=>b.s-a.s);
+function pts(q,a,ms){if(a==null||typeof a==='string')return 0;
+ if(q.o)return a===q.c?Math.round(600+400*Math.max(0,1-ms/(TM(q)*1000))):0;
+ return Math.round(1000*Math.max(0,1-Math.abs(a-q.c)/q.tol))}
+function pay(){
+ if(H.p==='l')return{p:'l',n:N()};
+ if(H.p==='q')return{p:'q',i:H.i,left:Math.max(0,Math.ceil((H.dl-Date.now())/1000)),a:Object.keys(H.an).length,n:N()};
+ const r={};for(const id in H.pl)r[id]=[H.pl[id].s,H.e?H.e[id]||0:0];
+ const o={p:H.p,i:H.i,r,h:H.hf,t:teams()};
+ if(H.p==='e')o.lb=rank().slice(0,10).map(x=>[x.n,x.s,x.team]);return o}
+const bc=()=>{try{room.emit('st',pay())}catch(e){}};
+function hostStart(){
+ if(!room)return;role='h';
+ room.on('join',m=>{const d=m.data||{};if(!d.id||!d.n)return;
+  const hasH=Object.entries(H.pl).some(([id,p])=>p.hoffi&&id!==d.id);
+  const p=H.pl[d.id]||{s:0};H.pl[d.id]=Object.assign(p,{n:String(d.n).slice(0,16),team:d.team==='h'?'h':'g',hoffi:!!d.hoffi&&!hasH});
+  hr();if(H.p==='l')bc()});
+ room.on('ans',m=>{const d=m.data||{};if(H.p!=='q'||d.i!==H.i||H.an[d.id]||!H.pl[d.id])return;
+  const q=Q[H.i],a=q.o?(d.a>=0&&d.a<4?d.a:null):(typeof d.a==='number'?d.a:null);if(a===null)return;
+  H.an[d.id]={a,ms:Math.max(0,Math.min(d.ms||0,TM(q)*1000))};
+  if(Object.keys(H.an).length>=N())finish();else{hr();bc()}});
+ setInterval(()=>{if(H.p==='q'){if(Date.now()>=H.dl)finish();else{const t=el('#htm');if(t)t.textContent=Math.ceil((H.dl-Date.now())/1000)}}},250);
+ setInterval(bc,1500);hr();
+}
+function startQ(i){H.i=i;H.p='q';H.an={};H.e=null;H.hf=null;H.dl=Date.now()+TM(Q[i])*1000;hr();bc()}
+function finish(){
+ if(H.p!=='q')return;const q=Q[H.i];H.e={};
+ for(const id in H.pl){const x=H.an[id],p=x?pts(q,x.a,x.ms):0;H.pl[id].s+=p;H.e[id]=p}
+ const hf=Object.keys(H.pl).find(id=>H.pl[id].hoffi);
+ H.hf=hf?[aTxt(q,H.an[hf]?H.an[hf].a:null),H.e[hf]]:null;H.p='r';hr();bc()}
+function hr(){
+ const k=[H.p,H.i,N(),Object.keys(H.an).length].join('|');if(k===hkey)return;hkey=k;
+ const q=Q[H.i],hd=q?`<div class="mut">Frage ${H.i+1}/${Q.length} <span class="tag">${q.d}</span></div>`:'';
+ const hoffiP=Object.entries(H.pl).find(([,p])=>p.hoffi);
+ if(H.p==='l'){
+  app.innerHTML=`<div class="c"><h1>🐼 Hoffis Abschieds-Quiz</h1><p>Öffnet diese Seite auf euren Smartphones und tretet bei!</p></div>
+  <div class="card"><h2>${N()} Spieler</h2>${Object.values(H.pl).map(p=>`<span class="chip ${p.team==='h'?'h':''}">${p.hoffi?'⭐ ':''}${esc(p.n)}</span>`).join('')||'<p class="mut">Noch niemand da …</p>'}
+  <p class="mut">${hoffiP?'Hoffi ist dabei ✓':'Hoffi ist noch nicht beigetreten.'}</p><button id="nx" ${N()?'':'disabled'}>Quiz starten</button></div>`;
+  el('#nx').onclick=()=>startQ(0);
+ }else if(H.p==='q'){
+  const hs=hoffiP?(H.an[hoffiP[0]]?'✓ Hoffi hat geantwortet':'… wartet auf Hoffi'):'Hoffi nicht im Raum';
+  app.innerHTML=`${hd}<div class="card"><h2>${q.t}</h2></div><div class="c big" id="htm">${Math.ceil((H.dl-Date.now())/1000)}</div>
+  ${q.o?`<div class="grid">${q.o.map((o,i)=>`<div class="opt o${i}"><span>${SH[i]}</span>${o}</div>`).join('')}</div>`:`<div class="card c"><b>Schätzfrage</b> – Antwort in: ${q.u}</div>`}
+  <div class="card c">${Object.keys(H.an).length}/${N()} haben geantwortet · ${hs}<button class="s" id="rv">Jetzt auflösen</button></div>`;
+  el('#rv').onclick=finish;
+ }else if(H.p==='r'){
+  const last=H.i===Q.length-1,t=teams();let dist='';
+  if(q.o){const cnt=q.o.map((_,i)=>Object.values(H.an).filter(x=>x.a===i).length),mx=Math.max(1,...cnt);
+   dist=`<div class="grid">${q.o.map((o,i)=>`<div class="opt o${i} ${i===q.c?'right':'dim'}"><div style="width:100%"><span>${SH[i]}</span> ${o}<div class="bar"><i style="width:${cnt[i]/mx*100}%"></i></div>${cnt[i]}</div></div>`).join('')}</div>`}
+  else{const best=Object.entries(H.an).sort((a,b)=>Math.abs(a[1].a-q.c)-Math.abs(b[1].a-q.c)).slice(0,3).map(([id,x])=>`<div class="row"><span>${esc(H.pl[id].n)}</span><b>${fmt(x.a)} ${q.u}</b></div>`).join('');
+   dist=`<div class="card"><b>Die besten Schätzungen</b>${best||'<p class="mut">Keine Schätzungen</p>'}</div>`}
+  const top=rank().slice(0,5).map((p,i)=>`<div class="row"><span>${i+1}. ${esc(p.n)} ${p.team==='h'?'🧳':'🎉'}</span><b>${fmt(p.s)}</b></div>`).join('');
+  app.innerHTML=`${hd}<div class="card"><h2>${q.t}</h2><div class="big ok">${esc(cTxt(q))}</div></div>
+  <div class="hoffi">🧳 Hoffi sagte: ${H.hf?`„${esc(H.hf[0])}“ (+${H.hf[1]} Punkte)`:'keine Antwort'}</div>${dist}
+  <div class="card"><b>Teams (Ø pro Spieler)</b><div class="row"><span>${TN.h}</span><b>${t[0]}</b></div><div class="row"><span>${TN.g}</span><b>${t[1]}</b></div></div>
+  <div class="card"><b>Top 5</b>${top}</div><button id="nx">${last?'🏆 Zur Rangliste':'Nächste Frage'}</button>`;
+  el('#nx').onclick=()=>{if(last){H.p='e';hr();bc()}else startQ(H.i+1)};
+ }else{
+  const t=teams(),r=rank(),win=t[0]===t[1]?'Unentschieden!':(t[0]>t[1]?'Team Hoffi gewinnt! 🧳':'Die Gäste gewinnen! 🎉'),med=['🥇','🥈','🥉'];
+  app.innerHTML=`<div class="c"><h1>🏆 Rangliste</h1><h2>${win}</h2><p class="mut">${TN.h}: ${t[0]} · ${TN.g}: ${t[1]} (Ø pro Spieler)</p></div>
+  <div class="card">${r.map((p,i)=>`<div class="row"><span>${med[i]||i+1+'.'} ${esc(p.n)} ${p.team==='h'?'🧳':'🎉'}</span><b>${fmt(p.s)}</b></div>`).join('')}</div>
+  <div class="hoffi c">Danke für alles, Hoffi! 🐼🥂</div>`;
+ }
+}
+</script></body></html>
